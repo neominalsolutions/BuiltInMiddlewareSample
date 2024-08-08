@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.ResponseCompression;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+// MVC için ekleyelim. AddViewLocalization().AddDataAnnotationsLocalization();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -53,7 +55,25 @@ builder.Services.AddResponseCompression(opt =>
 
 });
 
+builder.Services.AddResponseCaching();
 
+
+
+
+builder.Services.AddLocalization(opt =>
+{
+  opt.ResourcesPath = "Resources";
+
+});
+
+builder.Services.Configure<RequestLocalizationOptions>(opt =>
+{
+  var supportedCultures = new[] { new CultureInfo("en-US"), new CultureInfo("tr-TR") };
+
+  opt.DefaultRequestCulture = new("tr-TR");
+  opt.SupportedUICultures = supportedCultures;
+
+});
 
 
 var app = builder.Build();
@@ -66,6 +86,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseRequestLocalization();
 
 // Https Redirection Altýnda olmasýna özel gösterelim.
 app.UseCookiePolicy();
@@ -73,6 +94,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseSession();
 app.UseResponseCompression();
+app.UseResponseCaching();
 
 app.MapControllers();
 

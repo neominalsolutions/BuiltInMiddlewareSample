@@ -38,16 +38,22 @@ namespace BuiltInMiddlewareSample.Controllers
     }
 
     [HttpGet("compression")]
-    public async Task<IActionResult> ResponseCompression()
+    [ResponseCache(Duration = 300,VaryByHeader = "clientName", VaryByQueryKeys = new[] {"pageSize"})]
+    // 64 MB en fazla Response Body Cachelenbilir
+    // Get istekleri bekler status code 200 bekler
+    // Authorization Header için Cache yapılmıyor.
+    public async Task<IActionResult> ResponseCompression([FromHeader] string? clientName, [FromQuery] int pageSize = 1)
     {
       using var client = new HttpClient();
-      var task1 =  client.GetStringAsync("https://haberler.com");
+      var task1 =  client.GetStringAsync("https://google.com");
 
 
       var response = await task1;
 
       return Ok(response);
     }
+
+ 
 
 
 
